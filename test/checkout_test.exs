@@ -9,9 +9,16 @@ defmodule CheckoutTest do
     end
   end
 
+  property "sums without specials (but with metrics)", [:verbose] do
+    forall {item_list, expected_price, price_list} <- item_price_list() do
+      (expected_price == Checkout.total(item_list, price_list, []))
+      |> collect(MetricsHelper.bucket(length(item_list), 10))
+    end
+  end
+
   defp item_price_list do
     let price_list <- price_list() do
-      let {item_list, expected_price} <-  item_list(price_list) do
+      let {item_list, expected_price} <- item_list(price_list) do
         {item_list, expected_price, price_list}
       end
     end
