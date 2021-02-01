@@ -16,6 +16,12 @@ defmodule CheckoutTest do
     end
   end
 
+  property "sums including specials" do
+    forall {items, expected_price, prices, specials} <- item_price_special() do
+      expected_price == Checkout.total(items, prices, specials)
+    end
+  end
+
   defp item_price_list do
     let price_list <- price_list() do
       let {item_list, expected_price} <- item_list(price_list) do
