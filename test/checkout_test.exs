@@ -43,9 +43,32 @@ defmodule CheckoutTest do
 
     let specials <- list({elements(items), choose(2, 5), integer()}) do
       sorted = Enum.sort(specials)
-      IO.inspect "before: #{sorted}"
+      IO.inspect("before: #{sorted}")
       deduped = Enum.dedup_by(sorted, fn {x, _, _} -> x end)
-      IO.inspect "after: #{deduped}"
+      IO.inspect("after: #{deduped}")
+    end
+  end
+
+  defp regular_gen(price_list, special_list) do
+    regular_gen(price_list, special_list, [], 0)
+  end
+
+  defp regular_gen([], _, list, price), do: {list, price}
+
+  defp regular_gen([{item, cost} | prices], specials, items, price) do
+    count_gen =
+      case List.keyfind(specials, item, 0) do
+        {_, limit, _} -> choose(0, limit - 1)
+        _ -> non_neg_integer()
+      end
+
+    let count <- count_gen do
+      regular_gen(
+        prices,
+        specials,
+        let(v <- vector(count, item), do: v ++ items),
+        cost * count + price
+      )
     end
   end
 
