@@ -72,6 +72,22 @@ defmodule CheckoutTest do
     end
   end
 
+  defp special_gen(_, special_list) do
+    special_gen(special_list, [], 0)
+  end
+
+  defp special_gen([], items, price), do: {items, price}
+
+  defp special_gen([{item, count, cost} | specials], items, price) do
+    let multiplier <- non_neg_integer() do
+      special_gen(
+        specials,
+        let(v <- vector(count * multiplier, item), do: v ++ items),
+        cost * multiplier + price
+      )
+    end
+  end
+
   defp item_price_list do
     let price_list <- price_list() do
       let {item_list, expected_price} <- item_list(price_list) do
