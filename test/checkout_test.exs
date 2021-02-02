@@ -43,9 +43,7 @@ defmodule CheckoutTest do
 
     let specials <- list({elements(items), choose(2, 5), integer()}) do
       sorted = Enum.sort(specials)
-      IO.inspect("before: #{sorted}")
-      deduped = Enum.dedup_by(sorted, fn {x, _, _} -> x end)
-      IO.inspect("after: #{deduped}")
+      Enum.dedup_by(sorted, fn {x, _, _} -> x end)
     end
   end
 
