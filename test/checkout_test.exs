@@ -22,6 +22,33 @@ defmodule CheckoutTest do
     end
   end
 
+  defp item_price_special() do
+    # first let: freeze the price list
+    let price_list <- price_list() do
+      # second let: freeze the list of specials
+      let special_list <- special_list(price_list) do
+        # third let: regular + special items and prices
+        let {{regular_items, regular_expected}, {special_items, special_expected}} <-
+              {regular_gen(price_list, special_list), special_gen(price_list, special_list)} do
+          # and merge + return initial lists:
+          {Enum.shuffle(regular_items ++ special_items), regular_expected + special_expected,
+           price_list, special_list}
+        end
+      end
+    end
+  end
+
+  defp special_list(price_list) do
+    items = for {name, _} <- price_list, do: name
+
+    let specials <- list({elements(items), choose(2, 5), integer()}) do
+      sorted = Enum.sort(specials)
+      IO.inspect "before: #{sorted}"
+      deduped = Enum.dedup_by(sorted, fn {x, _, _} -> x end)
+      IO.inspect "after: #{deduped}"
+    end
+  end
+
   defp item_price_list do
     let price_list <- price_list() do
       let {item_list, expected_price} <- item_list(price_list) do
