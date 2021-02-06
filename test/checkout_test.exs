@@ -22,6 +22,20 @@ defmodule CheckoutTest do
     end
   end
 
+  property "negative testing for expected results" do
+    forall {items, prices, specials} <- lax_lists() do
+      try do
+        is_integer(Checkout.total(items, prices, specials))
+      rescue
+        _ -> false
+      end
+    end
+  end
+
+  defp lax_lists() do
+    {list(utf8()), list({utf8(), integer()}), list({utf8(), integer(), integer()})}
+  end
+
   defp item_price_special() do
     # first let: freeze the price list
     let price_list <- price_list() do
