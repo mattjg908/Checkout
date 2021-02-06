@@ -27,7 +27,11 @@ defmodule CheckoutTest do
       try do
         is_integer(Checkout.total(items, prices, specials))
       rescue
-        _ -> false
+        e in [RuntimeError] ->
+          String.starts_with?(e.message, "unknown item:")
+
+        _ ->
+          false
       end
     end
   end
