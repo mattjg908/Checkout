@@ -28,12 +28,36 @@ defmodule CheckoutTest do
         is_integer(Checkout.total(items, prices, specials))
       rescue
         e in [RuntimeError] ->
-          e.message == "invalid list of specials" ||
+          e.message == "invalid list of prices" || e.message == "invalid list of specials" ||
             String.starts_with?(e.message, "unknown item:")
 
         _ ->
           false
       end
+    end
+  end
+
+  property "list of items with duplicates" do
+    forall price_list <- dupe_list() do
+      false == Checkout.valid_price_list(price_list)
+    end
+  end
+
+  property "list of items with specials" do
+    forall special_list <- dupe_special_list() do
+      false == Checkout.valid_special_list(special_list)
+    end
+  end
+
+  defp dupe_special_list() do
+    let items <- non_empty(list(utf8())) do
+      vector(length(items) + 1, {elements(items), integer(), integer()})
+    end
+  end
+
+  defp dupe_list() do
+    let items <- non_empty(list(utf8())) do
+      vector(length(items) + 1, {elements(items), integer()})
     end
   end
 

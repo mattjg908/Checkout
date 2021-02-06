@@ -4,6 +4,10 @@ defmodule Checkout do
   """
 
   def total(item_list, price_list, specials) do
+    if not valid_price_list(price_list) do
+      raise RuntimeError, message: "invalid list of prices"
+    end
+
     if not valid_special_list(specials) do
       raise RuntimeError, message: "invalid list of specials"
     end
@@ -13,8 +17,16 @@ defmodule Checkout do
     prices + apply_regular(counts_left, price_list)
   end
 
+  def valid_price_list(list) do
+    sorted = Enum.sort(list)
+    length(list) == length(Enum.dedup_by(sorted, fn {x, _} -> x end))
+  end
+
   def valid_special_list(list) do
-    Enum.all?(list, fn {_, x, _} -> x != 0 end)
+    sorted = Enum.sort(list)
+
+    Enum.all?(list, fn {_, x, _} -> x != 0 end) &&
+      length(list) == length(Enum.dedup_by(sorted, fn {x, _, _} -> x end))
   end
 
   defp count_seen(item_list) do
